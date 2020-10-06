@@ -21,12 +21,10 @@ export default function QuoteEdit( {
 	attributes,
 	setAttributes,
 	isSelected,
-	mergeBlocks,
-	onReplace,
 	className,
 	insertBlocksAfter,
 } ) {
-	const { align, value, citation } = attributes;
+	const { align, citation } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `has-text-align-${ align }` ]: align,
@@ -53,6 +51,27 @@ export default function QuoteEdit( {
 					] }
 					renderAppender={ () => <InnerBlocks.ButtonBlockAppender /> }
 				/>
+				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
+					<RichText
+						identifier="citation"
+						value={ citation }
+						onChange={ ( nextCitation ) =>
+							setAttributes( {
+								citation: nextCitation,
+							} )
+						}
+						__unstableMobileNoFocusOnMount
+						placeholder={
+							// translators: placeholder text used for the citation
+							__( 'Write citation…' )
+						}
+						className="wp-block-quote__citation"
+						textAlign={ align }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
+					/>
+				) }
 			</BlockQuotation>
 		</>
 	);
