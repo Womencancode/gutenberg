@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	AlignmentToolbar,
 	BlockControls,
+	InnerBlocks,
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
@@ -43,60 +44,14 @@ export default function QuoteEdit( {
 				/>
 			</BlockControls>
 			<BlockQuotation { ...blockProps }>
-				<RichText
-					identifier="value"
-					multiline
-					value={ value }
-					onChange={ ( nextValue ) =>
-						setAttributes( {
-							value: nextValue,
-						} )
-					}
-					onMerge={ mergeBlocks }
-					onRemove={ ( forward ) => {
-						const hasEmptyCitation =
-							! citation || citation.length === 0;
-						if ( ! forward && hasEmptyCitation ) {
-							onReplace( [] );
-						}
-					} }
-					placeholder={
-						// translators: placeholder text used for the quote
-						__( 'Write quote…' )
-					}
-					onReplace={ onReplace }
-					onSplit={ ( piece ) =>
-						createBlock( 'core/quote', {
-							...attributes,
-							value: piece,
-						} )
-					}
-					__unstableOnSplitMiddle={ () =>
-						createBlock( 'core/paragraph' )
-					}
-					textAlign={ align }
+				<InnerBlocks
+					allowedBlocks={ [
+						'core/code',
+						'core/heading',
+						'core/list',
+						'core/paragraph',
+					] }
 				/>
-				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-					<RichText
-						identifier="citation"
-						value={ citation }
-						onChange={ ( nextCitation ) =>
-							setAttributes( {
-								citation: nextCitation,
-							} )
-						}
-						__unstableMobileNoFocusOnMount
-						placeholder={
-							// translators: placeholder text used for the citation
-							__( 'Write citation…' )
-						}
-						className="wp-block-quote__citation"
-						textAlign={ align }
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
-						}
-					/>
-				) }
 			</BlockQuotation>
 		</>
 	);
