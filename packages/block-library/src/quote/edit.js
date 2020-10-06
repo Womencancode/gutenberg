@@ -51,6 +51,9 @@ export default function QuoteEdit( {
 						'core/list',
 						'core/paragraph',
 					] }
+					renderAppender={ () => (
+						<InnerBlocks.ButtonBlockAppender />
+					) }
 				/>
 			</BlockQuotation>
 		</>
