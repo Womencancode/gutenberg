@@ -7,7 +7,7 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
-import { parse } from '@wordpress/blocks';
+import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 
 const blockAttributes = {
 	citation: {
@@ -118,10 +118,23 @@ const deprecated = [
 			},
 		},
 		migrate( attributes ) {
-			return [
-				omit( attributes, [ 'value' ] ),
-				parse( attributes.value ),
-			];
+			// The old value attribute for quotes can contain:
+			// - a single paragraph: "<p>single paragraph</p>"
+			// - multiple paragraphs: "<p>first paragraph</p><p>second paragraph</p>"
+			const innerBlocks = parseWithAttributeSchema( attributes.value, {
+				type: 'array',
+				source: 'query',
+				selector: 'p',
+				query: {
+					value: {
+						type: 'string',
+						source: 'text',
+					},
+				},
+			} ).map( ( { value } ) =>
+				createBlock( 'core/paragraph', { content: value } )
+			);
+			return [ omit( attributes, [ 'value' ] ), innerBlocks ];
 		},
 		save( { attributes: { value, citation } } ) {
 			return (
