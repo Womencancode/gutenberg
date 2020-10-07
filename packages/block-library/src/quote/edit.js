@@ -35,9 +35,7 @@ export default function QuoteEdit( {
 
 	const { isAncestorOfSelectedBlock } = useSelect(
 		( select ) => {
-			const { hasSelectedInnerBlock } = select(
-				'core/block-editor'
-			);
+			const { hasSelectedInnerBlock } = select( 'core/block-editor' );
 
 			return {
 				isAncestorOfSelectedBlock: hasSelectedInnerBlock(
