@@ -7,7 +7,7 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { parse } from '@wordpress/blocks';
 
 const blockAttributes = {
 	citation: {
@@ -120,11 +120,7 @@ const deprecated = [
 		migrate( attributes ) {
 			return [
 				omit( attributes, [ 'value' ] ),
-				[
-					createBlock( 'core/paragraph', {
-						content: attributes.value,
-					} ),
-				],
+				parse( attributes.value ),
 			];
 		},
 		save( { attributes: { value, citation } } ) {
