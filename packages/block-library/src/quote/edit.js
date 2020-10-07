@@ -74,7 +74,9 @@ export default function QuoteEdit( {
 							: InnerBlocks.ButtonBlockAppender
 					}
 				/>
-				{ ( ! RichText.isEmpty( citation ) || isSelected || isAncestorOfSelectedBlock ) && (
+				{ ( ! RichText.isEmpty( citation ) ||
+					isSelected ||
+					isAncestorOfSelectedBlock ) && (
 					<RichText
 						identifier="citation"
 						value={ citation }
