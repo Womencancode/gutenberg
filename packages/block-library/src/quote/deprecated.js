@@ -7,15 +7,9 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 
 const blockAttributes = {
-	value: {
-		type: 'string',
-		source: 'html',
-		selector: 'blockquote',
-		multiline: 'p',
-		default: '',
-	},
 	citation: {
 		type: 'string',
 		source: 'html',
@@ -107,6 +101,38 @@ const deprecated = [
 					<RichText.Content multiline value={ value } />
 					{ ! RichText.isEmpty( citation ) && (
 						<RichText.Content tagName="footer" value={ citation } />
+					) }
+				</blockquote>
+			);
+		},
+	},
+	{
+		attributes: {
+			...blockAttributes,
+			value: {
+				type: 'string',
+				source: 'html',
+				selector: 'blockquote',
+				multiline: 'p',
+				default: '',
+			},
+		},
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'value' ] ),
+				[
+					createBlock( 'core/paragraph', {
+						content: attributes.value,
+					} ),
+				],
+			];
+		},
+		save( { attributes: { value, citation } } ) {
+			return (
+				<blockquote>
+					<RichText.Content multiline value={ value } />
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="cite" value={ citation } />
 					) }
 				</blockquote>
 			);
