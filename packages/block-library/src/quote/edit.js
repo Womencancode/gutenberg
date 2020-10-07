@@ -16,6 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 export default function QuoteEdit( {
 	attributes,
@@ -23,6 +24,7 @@ export default function QuoteEdit( {
 	isSelected,
 	className,
 	insertBlocksAfter,
+	clientId,
 } ) {
 	const { align, citation } = attributes;
 	const blockProps = useBlockProps( {
@@ -31,6 +33,16 @@ export default function QuoteEdit( {
 		} ),
 	} );
 
+	const { hasChildBlocks } = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( 'core/block-editor' );
+
+			return {
+				hasChildBlocks: getBlockOrder( clientId ).length > 0,
+			};
+		},
+		[ clientId ]
+	);
 	return (
 		<>
 			<BlockControls>
@@ -49,7 +61,11 @@ export default function QuoteEdit( {
 						'core/list',
 						'core/paragraph',
 					] }
-					renderAppender={ () => <InnerBlocks.ButtonBlockAppender /> }
+					renderAppender={
+						hasChildBlocks
+							? undefined
+							: InnerBlocks.ButtonBlockAppender
+					}
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
