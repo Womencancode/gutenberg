@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
+import {
+	createBlock,
+	parseWithAttributeSchema,
+	serialize,
+} from '@wordpress/blocks';
 import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
 const transforms = {
@@ -186,9 +190,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation, anchor } ) => {
+			transform: ( { citation, anchor }, innerBlocks ) => {
 				return createBlock( 'core/pullquote', {
-					value,
+					value: innerBlocks.reduce( ( acc, currentBlock ) => {
+						return `${ acc }${ serialize( currentBlock ) }`;
+					}, '' ),
 					citation,
 					anchor,
 				} );
