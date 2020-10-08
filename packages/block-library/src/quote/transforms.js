@@ -5,6 +5,7 @@ import {
 	createBlock,
 	parseWithAttributeSchema,
 	serialize,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
@@ -191,10 +192,23 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
 			transform: ( { citation, anchor }, innerBlocks ) => {
+				const paragraphs = [];
+				innerBlocks.forEach( ( block ) => {
+					if ( 'core/paragraph' === block.name ) {
+						paragraphs.push( block );
+					} else {
+						const newBlocks = switchToBlockType(
+							block,
+							'core/paragraph'
+						);
+						if ( newBlocks ) {
+							paragraphs.push( ...newBlocks );
+						}
+					}
+				} );
+				paragraphs.filter( Boolean );
 				return createBlock( 'core/pullquote', {
-					value: innerBlocks.reduce( ( acc, currentBlock ) => {
-						return `${ acc }${ serialize( currentBlock ) }`;
-					}, '' ),
+					value: serialize( paragraphs ),
 					citation,
 					anchor,
 				} );
