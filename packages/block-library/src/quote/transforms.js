@@ -9,19 +9,19 @@ import {
 } from '@wordpress/blocks';
 import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
-const toParagraphs = ( blocks ) => {
-	const paragraphs = [];
+const toBlocksOfType = ( blocks, type ) => {
+	const result = [];
 	blocks.forEach( ( block ) => {
-		if ( 'core/paragraph' === block.name ) {
-			paragraphs.push( block );
+		if ( type === block.name ) {
+			result.push( block );
 		} else {
-			const newBlocks = switchToBlockType( block, 'core/paragraph' );
+			const newBlocks = switchToBlockType( block, type );
 			if ( newBlocks ) {
-				paragraphs.push( ...newBlocks );
+				result.push( ...newBlocks );
 			}
 		}
 	} );
-	return paragraphs.filter( Boolean );
+	return result.filter( Boolean );
 };
 
 const transforms = {
@@ -130,7 +130,10 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			transform: ( { citation }, innerBlocks ) => {
-				const paragraphs = toParagraphs( innerBlocks );
+				const paragraphs = toBlocksOfType(
+					innerBlocks,
+					'core/paragraph'
+				);
 				if ( citation && citation !== '<p></p>' ) {
 					paragraphs.push(
 						createBlock( 'core/paragraph', {
@@ -196,7 +199,9 @@ const transforms = {
 			blocks: [ 'core/pullquote' ],
 			transform: ( { citation, anchor }, innerBlocks ) => {
 				return createBlock( 'core/pullquote', {
-					value: serialize( toParagraphs( innerBlocks ) ),
+					value: serialize(
+						toBlocksOfType( innerBlocks, 'core/paragraph' )
+					),
 					citation,
 					anchor,
 				} );
